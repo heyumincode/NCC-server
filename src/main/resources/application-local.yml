@@ -5,7 +5,7 @@ spring:
   sql:
     init:
       mode: always
-      data-locations: file:../database/seeds/dev_seed.sql
+      data-locations: classpath:db/seeds/dev_seed.sql
       continue-on-error: false
 
 chongchao:
