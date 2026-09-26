@@ -43,8 +43,8 @@ chongchao:
   staff-session-hours: ${STAFF_SESSION_HOURS:12}
   ticket-qr-prefix: ${TICKET_QR_PREFIX:CHONGCHAO:TICKET:}
   # 默认值留空, 强制走 env var (local profile 在 application-local.yml 提供占位)
+  # 默认值用单引号包住防止 YAML 把 * 解析成 alias 标记
   wechat:
     app-id: ${WECHAT_APP_ID:}
-    app-secret: ***}
+    app-secret: ${WECHAT_APP_SECRET:''}
     mock-enabled: ${WECHAT_MOCK_ENABLED:false}
-
