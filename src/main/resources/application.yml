@@ -1,0 +1,50 @@
+spring:
+  application:
+    name: chongchao-week1-backend
+  # 业务日志统一在 logback-spring.xml 里配置；这里只放需要按 profile 覆盖的项
+  # 默认激活 local profile：开发者 IDEA 直接 Run / mvn spring-boot:run 都自动加载
+  # application-local.yml（admin-token / staff-passcode / 微信 mock / dev_seed / DEBUG）。
+  # 生产部署必须通过环境变量 SPRING_PROFILES_ACTIVE=prod 覆盖。
+  profiles:
+    active: local
+  datasource:
+    url: ${DATABASE_URL:jdbc:postgresql://localhost:5432/chongchao}
+    username: ${DATABASE_USERNAME:postgres}
+    password: ${DATABASE_PASSWORD:postgres}
+    hikari:
+      maximum-pool-size: ${DATABASE_POOL_SIZE:20}
+      connection-timeout: 5000
+  flyway:
+    enabled: true
+    locations: classpath:db/migration
+    validate-on-migrate: true
+  jackson:
+    default-property-inclusion: non_null
+    time-zone: Asia/Shanghai
+
+server:
+  port: ${SERVER_PORT:8585}
+  forward-headers-strategy: framework
+
+management:
+  endpoints:
+    web:
+      exposure:
+        include: health,info,metrics
+  endpoint:
+    health:
+      probes:
+        enabled: true
+
+chongchao:
+  admin-token: ${ADMIN_TOKEN:}
+  staff-passcode: ${STAFF_PASSCODE:}
+  user-session-hours: ${USER_SESSION_HOURS:168}
+  staff-session-hours: ${STAFF_SESSION_HOURS:12}
+  ticket-qr-prefix: ${TICKET_QR_PREFIX:CHONGCHAO:TICKET:}
+  # 默认值留空, 强制走 env var (local profile 在 application-local.yml 提供占位)
+  wechat:
+    app-id: ${WECHAT_APP_ID:}
+    app-secret: ***}
+    mock-enabled: ${WECHAT_MOCK_ENABLED:false}
+

@@ -1,0 +1,76 @@
+# ============================================================================
+# 生产环境 profile
+# 激活方式: SPRING_PROFILES_ACTIVE=prod
+#
+# 与 application.yml 共享的所有项 (dataSource/flyway/jackson 等) 默认全部继承。
+# 这里只覆盖必须不同的部分。所有敏感配置(env-var only) 无默认值,
+# 缺失会导致 Spring 启动失败 (fail-fast)。
+# ============================================================================
+
+spring:
+  # ---- 安全: 不注入种子数据 ----
+  sql:
+    init:
+      mode: never  # application-local.yml 的 always 在 prod 关闭
+
+  # ---- Flyway: 生产库容错 ----
+  flyway:
+    # 如果 prod 库目标 schema 已有内容 (比如手动建过表),baseline 标记起点
+    baseline-on-migrate: true
+    baseline-version: 0
+
+  # ---- DB 连接池: 生产规模 ----
+  datasource:
+    # 密码无默认值,缺则 fail-fast
+    url: ${DATABASE_URL}
+    username: ${DATABASE_USERNAME}
+    password: ${DATABASE_PASSWORD}
+    hikari:
+      maximum-pool-size: ${DATABASE_POOL_SIZE:30}
+      minimum-idle: 5
+      connection-timeout: 10000
+      idle-timeout: 300000          # 5min
+      max-lifetime: 1800000         # 30min
+      pool-name: chongchao-prod-pool
+      leak-detection-threshold: 60000  # 60s 没归还的连接视为泄漏
+
+# ---- HTTP: 不要向客户端泄露错误细节 ----
+server:
+  port: ${SERVER_PORT:8585}
+  compression:
+    enabled: true
+    mime-types: application/json,application/xml,text/html,text/plain
+  error:
+    include-message: never
+    include-stacktrace: never
+
+# ---- Actuator: 健康检查详情需要鉴权 ----
+management:
+  endpoint:
+    health:
+      show-details: when-authorized
+      probes:
+        enabled: true
+
+# ---- 业务配置: env-var only ----
+chongchao:
+  # 无默认值,缺 ADMIN_TOKEN 时启动会失败
+  admin-token: ${ADMIN_TOKEN}
+  staff-passcode: ${STAFF_PASSCODE}
+  wechat:
+    # 强制走 env var, 缺 WECHAT_APP_ID/WECHAT_APP_SECRET 时启动失败
+    app-id: ${WECHAT_APP_ID}
+    app-secret: ${WECHAT_APP_SECRET}
+    mock-enabled: false  # 生产禁用 mock
+
+# ---- 日志: 生产不开 DEBUG ----
+logging:
+  level:
+    root: INFO
+    com.chongchao: INFO
+    org.springframework: WARN
+    org.flywaydb: INFO
+    org.springframework.web.servlet: WARN
+    org.springframework.jdbc.core: WARN
+    org.hibernate.SQL: WARN
+    org.postgresql: WARN

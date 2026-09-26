@@ -1,0 +1,23 @@
+spring:
+  datasource:
+    username: postgres
+    password: postgres
+  sql:
+    init:
+      mode: always
+      data-locations: file:../database/seeds/dev_seed.sql
+      continue-on-error: false
+
+chongchao:
+  admin-token: local-admin-change-me
+  staff-passcode: 2026-local-staff
+  wechat:
+    app-id: local-app-id
+    app-secret: local-app-secret
+    mock-enabled: true
+
+logging:
+  level:
+    com.chongchao.mvp: DEBUG
+    # 本地开发开 SQL/参数日志,能直接看到 JdbcClient 发出的真实语句
+    org.springframework.jdbc.core: DEBUG
